@@ -2,13 +2,15 @@ const { response } = require("express");
 const express = require("express");
 const request = require("request");
 const bodyParser = require("body-parser");
+const { json } = require("body-parser");
 const app = express();
 
-
+app.use(express.json())
 //routes
 app.get("/", (req, res) => {
   res.send("Hello world!!");
 });
+
 
 const security_key="HhU/6mX+0JTLtHShOJXMG8vi/1+Yk1Mnvv8HUqtmlOpdJ/6ucXvkUswL6nMGLhDnVJqlpTuGq9T79jgHLTHOp0IyhM6S4GD/gI86KabNXvs/ei/WDhKgRc15gmORlkblE0HKi+ieh0DSJzMeK8TCWRW60M9MnBylpvnhWejEivbx+JwdFPiibvMPcBSXLSpziMEVYUFiaHDq23fpWsciy/CWoar5Mw30Vq+APCnMrIB296p8OHVHLR6XjeE+seTIF6NpgXgZALSEc+Ky5DULXa+hJPloJ09lDxg8LEErfTmTSsbpZOcLh2iU8450NV+Rq6p6CGCI6tbwG97JTsZOLw=="
 
@@ -118,8 +120,8 @@ app.post('/results', (req, res)=>{
 app.post('/stk', access, (req, res)=>{
     let url='https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
     let auth= "Bearer " + req.access_token;
-	const phone=req.body.phone.substring(1);
-	const amount=req.body.amount;
+	  let phone=req.body.phone.substring(1);
+	  let amount=req.body.amount;
     const date= new Date()
     let timestamp = date.getFullYear() + "" + "" + date.getMonth() + "" + "" + date.getDate() + "" + "" + date.getHours() + "" + "" + date.getMinutes() + "" + "" + date.getSeconds()
     const password= new Buffer.from('174379'+'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'+timestamp).toString('base64')
