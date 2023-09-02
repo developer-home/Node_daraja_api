@@ -8,21 +8,26 @@ const app = express();
 app.use(express.json())
 //routes
 app.get("/", (req, res) => {
-  res.send("Hello world!!");
+  //res.send("Hello world!!");
+    // Use the path to your index.html file
+    const indexPath = __dirname + '/index.html';
+console.log(indexPath);
+    // Send the index.html file as a response
+    res.sendFile(indexPath);
 });
 
 
 const security_key="HhU/6mX+0JTLtHShOJXMG8vi/1+Yk1Mnvv8HUqtmlOpdJ/6ucXvkUswL6nMGLhDnVJqlpTuGq9T79jgHLTHOp0IyhM6S4GD/gI86KabNXvs/ei/WDhKgRc15gmORlkblE0HKi+ieh0DSJzMeK8TCWRW60M9MnBylpvnhWejEivbx+JwdFPiibvMPcBSXLSpziMEVYUFiaHDq23fpWsciy/CWoar5Mw30Vq+APCnMrIB296p8OHVHLR6XjeE+seTIF6NpgXgZALSEc+Ky5DULXa+hJPloJ09lDxg8LEErfTmTSsbpZOcLh2iU8450NV+Rq6p6CGCI6tbwG97JTsZOLw=="
 
 //access token
-app.get("/access_token", access, (req, res) => {
+app.get("/api/v1/access_token", access, (req, res) => {
   res.status(200).json({ access_token: req.access_token });
 });
 
 
 
 //register urls
-app.get("/register", access, (req, res) => {
+app.get("/api/v1/register", access, (req, res) => {
   let url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
   let auth = "Bearer " + req.access_token;
   request(
@@ -46,18 +51,18 @@ app.get("/register", access, (req, res) => {
 });
 
 //confirmation urls
-app.post('/confirmation', (req, res) => {
+app.post('/api/v1/confirmation', (req, res) => {
     console.log('....................... confirmation .............')
     console.log(req.body)
 })
 
 //validation urls
-app.post('/validation', (req, resp) => {
+app.post('/api/v1/validation', (req, resp) => {
     console.log('....................... validation .............')
     console.log(req.body)
 })
 
-app.get('/simulate', access, (req, res)=>{
+app.get('/api/v1/simulate', access, (req, res)=>{
   let url='https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate';
   let auth="Bearer " + req.access_token;
   request(
@@ -69,7 +74,7 @@ app.get('/simulate', access, (req, res)=>{
         "ShortCode": "600383",
         "CommandID": "CustomerPayBillOnline",
         "Amount": "100",
-        "Msisdn": "254708374149",
+        "Msisdn": "254791980616",
         "BillRefNumber": "TestAPI"
       },
     },
@@ -79,7 +84,7 @@ app.get('/simulate', access, (req, res)=>{
   )
 });
 
-app.get('/balance', access, (req, res)=>{
+app.get('/api/v1/balance', access, (req, res)=>{
 let url="https://sandbox.safaricom.co.ke/mpesa/accountbalance/v1/query";
 let auth= "Bearer "+ req.access_token
 request(
@@ -108,23 +113,38 @@ request(
 )
 });
 
-app.post('/time_out', (req, res)=>{
+app.post('/api/v1/time_out', (req, res)=>{
   console.log("time out!!!")
   console.log(req.body)
 })
-app.post('/results', (req, res)=>{
+app.post('/api/v1/results', (req, res)=>{
   console.log("Results")
   console.log(req.body)
 })
 
-app.post('/stk', access, (req, res)=>{
+app.post('/api/v1/stk', access, (req, res)=>{
     let url='https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
     let auth= "Bearer " + req.access_token;
-	  let phone=req.body.phone.substring(1);
+	  let phone='791980616';
 	  let amount=req.body.amount;
     const date= new Date()
-    let timestamp = date.getFullYear() + "" + "" + date.getMonth() + "" + "" + date.getDate() + "" + "" + date.getHours() + "" + "" + date.getMinutes() + "" + "" + date.getSeconds()
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Adding 1 to get the month in the range 1-12 and padding with leading zero if needed
+    const day = String(date.getDate()).padStart(2, '0'); // Padding with leading zero if needed
+    const hours = String(date.getHours()).padStart(2, '0'); // Padding with leading zero if needed
+    const minutes = String(date.getMinutes()).padStart(2, '0'); // Padding with leading zero if needed
+    const seconds = String(date.getSeconds()).padStart(2, '0'); // Padding with leading zero if needed
+    
+    const timestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
+    
+    console.log('timestamp1: '+timestamp);
+
+    //let timestamp = date.getFullYear() + "" + "" + date.getMonth() + "" + "" + date.getDate() + "" + "" + date.getHours() + "" + "" + date.getMinutes() + "" + "" + date.getSeconds()
     const password= new Buffer.from('174379'+'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'+timestamp).toString('base64')
+    console.log('date.getMonth(): '+date.getMonth());
+    console.log('date.geth(): '+date.getHours());
+
+    // Get the current timestamp in seconds
 
     request(
         {
@@ -155,12 +175,12 @@ app.post('/stk', access, (req, res)=>{
     console.log(req.body)
     console.log(timestamp)
 })
-app.post('/stk_callback', (req, res)=>{
-  console.log('Stk results')
+app.post('/api/v1/stk_callback', (req, res)=>{
+  console.log('-------------------Stk results-----------------')
   console.log(req.body)
 })
 
-app.get('/b2c', access,(req, res)=>{
+app.get('/api/v1/b2c', access,(req, res)=>{
     let url='https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest';
     let auth= 'Bearer ' + req.access_token;
 
@@ -189,18 +209,18 @@ app.get('/b2c', access,(req, res)=>{
     )
     //console.log('c2b here')
 })
-app.post('/b2c_timeout', (req, res)=>{
+app.post('/api/v1/b2c_timeout', (req, res)=>{
   console.log('b2c timeout')
   console.log(req.body)
 
 })
-app.post('b2c_results', (req, res)=>{
+app.post('/api/v1/b2c_results', (req, res)=>{
   console.log('b2c results')
   console.log(req.body)
 })
 
 
-app.get('/reversal',access, (req, res)=>{
+app.get('/api/v1/reversal',access, (req, res)=>{
   let url='https://sandbox.safaricom.co.ke/mpesa/reversal/v1/request'
   let auth= "Bearer "+ req.access_token
 
@@ -214,7 +234,7 @@ app.get('/reversal',access, (req, res)=>{
       "Initiator": "TestInit610",
       "SecurityCredential": security_key,
       "CommandID": "TransactionReversal",
-      "TransactionID": "OEI2AK4Q16",
+      "TransactionID": "RI22QAP2T0",
       "Amount": "1",
       "ReceiverParty": "600610",
       "RecieverIdentifierType": "4",
@@ -229,33 +249,32 @@ app.get('/reversal',access, (req, res)=>{
   }
   )
 })
-app.post('/reversal_timeout', (req, res)=>{
+app.post('/api/v1/reversal_timeout', (req, res)=>{
   console.log('reversal timeout')
   console.log(req.body)
 
 })
-app.post('reversal_results', (req, res)=>{
+app.post('/api/v1/reversal_results', (req, res)=>{
   console.log('reversal results')
   console.log(req.body)
 })
-//access function
+//access function https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials
 function access(req, res, next) {
   let url =
     "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-  let auth = new Buffer.from(
-    "Tjge0Hbp4Zi3ytA3HRXZpB5J2PVlHUPL:dNNPRFKYLKBuiuLp"
-  ).toString("base64");
+    let auth = new Buffer.from("IcVbligM1Air19vrYPLrLqwGGmDEqpWS:PGzA2XMB2f0pCnAp").toString("base64");
   request(
     {
       url: url,
       headers: {
         "Authorization": "Basic " + auth,
-      },
+      }
     },
     (error, response, body) => {
       if (error) {
         console.log(error);
       } else {
+        //res.status(200).json(body);
         req.access_token = JSON.parse(body).access_token;
         next();
       }
